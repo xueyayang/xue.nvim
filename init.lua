@@ -28,7 +28,6 @@ require("lazy").setup({
         -- 自动导入 lua/xue_plug 文件夹下的所有模块
         { import = "xue_plug" },
     },
-    install = { colorscheme = { "vsassist", "onedark", "default" } },
     checker = { enabled = false },
 })
 

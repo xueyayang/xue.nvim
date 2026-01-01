@@ -143,10 +143,24 @@ return {
   },
 
   -- 颜色主题
-  { 'https://github.com/catppuccin/nvim',      name = 'catppuccin' },
-  { 'https://github.com/joshdick/onedark.vim', name = 'onedark' },
+  -- 不使用的主题设置为懒加载（不会自动加载，除非手动切换主题）
+  {
+    'https://github.com/catppuccin/nvim',
+    name = 'catppuccin',
+    lazy = true,
+    -- 不设置触发条件，只有在手动执行 :colorscheme catppuccin 时才会加载
+  },
+  {
+    'https://github.com/joshdick/onedark.vim',
+    name = 'onedark',
+    lazy = true,
+    -- 不设置触发条件，只有在手动执行 :colorscheme onedark 时才会加载
+  },
+  -- 正在使用的主题不应该懒加载，需要在启动时立即应用
   {
     'xueyayang/vsassist.nvim',
+    -- 不设置 lazy，启动时立即加载
+    priority = 1000,  -- 高优先级，确保优先加载
     config = function()
       vim.cmd([[colorscheme vsassist]])
     end,

@@ -27,16 +27,16 @@ return {
   {
     'nvim-telescope/telescope.nvim',
     tag = 'v0.2.1',
-    lazy=true,
+    lazy = true,
     dependencies = { 'nvim-lua/plenary.nvim' },
-    -- Telescope 键映射
+    -- Telescope 键映射（使用函数形式，确保懒加载正确触发）
     keys = {
-      { '<A-S-o>', ':Telescope find_files<CR>',            desc = "Find files" },
-      { '<A-S-s>', ':Telescope lsp_workspace_symbols<CR>', desc = "LSP Workspace Symbols" },
-      { '<A-m>',   ':Telescope lsp_document_symbols<CR>',  desc = "Lsp list method" },
-      { '<A-g>',   ':Telescope lsp_definitions<CR>',       desc = "LSP go to definition" },
-      { '<A-b>',   ':Telescope buffers<CR>',               desc = "buffers" },
-      { '<A-h>',   ':Telescope oldfiles<CR>',              desc = "history (oldfiles)" },
+      { '<A-S-o>', function() require('telescope.builtin').find_files() end, desc = "Find files" },
+      { '<A-S-s>', function() require('telescope.builtin').lsp_workspace_symbols() end, desc = "LSP Workspace Symbols" },
+      { '<A-m>',   function() require('telescope.builtin').lsp_document_symbols() end, desc = "Lsp list method" },
+      { '<A-g>',   function() require('telescope.builtin').lsp_definitions() end, desc = "LSP go to definition" },
+      { '<A-b>',   function() require('telescope.builtin').buffers() end, desc = "buffers" },
+      { '<A-h>',   function() require('telescope.builtin').oldfiles() end, desc = "history (oldfiles)" },
     },
     config = function()
       require('telescope').setup {
@@ -58,6 +58,8 @@ return {
   -- Telescope FZF native
   {
     'nvim-telescope/telescope-fzf-native.nvim',
+    lazy = true,
+    dependencies = { 'nvim-telescope/telescope.nvim' },
     build = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release --target install',
     config = function()
       require('telescope').load_extension('fzf')

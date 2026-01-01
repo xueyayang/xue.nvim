@@ -1,0 +1,274 @@
+set nocompatible
+filetype off
+
+set rtp+=~/AppData/Local/nvim/bundle/Vundle.vim
+call vundle#begin('~/AppData/Local/nvim/bundle')
+
+"Vundle itself
+Plugin 'gmarik/vundle'
+
+"--------------------------------------------------------------------------------
+" Holy Basic and solid enough by my test
+"--------------------------------------------------------------------------------
+" tree sitter
+Plugin 'https://github.com/nvim-treesitter/nvim-treesitter'
+
+"--------------------------------------------------------------------------------
+" File system
+"--------------------------------------------------------------------------------
+"plenary: 
+Plugin 'https://github.com/nvim-lua/plenary.nvim'
+"telescope
+Plugin 'https://github.com/nvim-telescope/telescope.nvim'
+Plugin 'nvim-telescope/telescope-fzf-native.nvim'
+"nvim-tree.lua
+Plugin 'preservim/nerdtree'
+Plugin 'ryanoasis/vim-devicons'
+Plugin 'nvim-tree/nvim-web-devicons'
+
+"--------------------------------------------------------------------------------
+" File content
+"--------------------------------------------------------------------------------
+"blink.cmp
+Plugin 'saghen/blink.cmp'
+Plugin 'https://gitee.com/xueyayang/x_cmp_cn'
+"auto-pair
+Plugin 'windwp/nvim-autopairs'
+"friendly-snippets
+Plugin	'xueyayang/friendly-snippets'
+
+"--------------------------------------------------------------------------------
+" Looks
+"--------------------------------------------------------------------------------
+"lualine
+Plugin 'nvim-lualine/lualine.nvim'
+"catppuccin
+Plugin 'https://github.com/catppuccin/nvim'
+"onedark
+Plugin 'https://github.com/joshdick/onedark.vim'
+Plugin 'xueyayang/vsassist.nvim'
+"Colorscheme package
+Plugin 'flazz/vim-colorschemes'
+
+" All of your Plugins must be added before the following line
+call vundle#end()            " required
+filetype plugin indent on    " required
+" vundle end
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" init.vim
+lua << EOF
+
+-- 设置<Leaer>
+vim.g.mapleader = ' '
+
+--------------------------------------------------------------------------------
+-- treesitter 设置
+--------------------------------------------------------------------------------
+require'nvim-treesitter.configs'.setup {
+  -- A list of parser names, or "all" (the four listed parsers should always be installed)
+  ensure_installed = {"cpp"},
+
+  -- Install parsers synchronously (only applied to `ensure_installed`)
+  sync_install = false,
+
+  highlight = {
+    enable = true,
+    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+    -- Using this option may slow down your editor, and you may see some duplicate highlights.
+    -- Instead of true it can also be a list of languages
+    additional_vim_regex_highlighting = false,
+  },
+  indent = { enable = true },
+}
+
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+vim.opt.foldlevel =99
+
+--------------------------------------------------------------------------------
+-- Telescope
+--------------------------------------------------------------------------------
+require('telescope').setup{
+  defaults = {
+	layout_strategy = 'vertical',
+    layout_config = {
+      vertical = { width = 0.618 }
+    },
+  },
+  pickers = {
+    lsp_document_symbols = {
+      symbol_width = 0.8,
+    },
+  }
+}
+
+require('telescope').load_extension('fzf')
+-- Alt+Shift+O -> Telescope find_files
+vim.keymap.set('n', '<A-S-o>', ':Telescope find_files<CR>', { noremap = true, silent = true, desc = "Find files" })
+
+-- Alt+Shift+S -> Telescope lsp_document_symbols
+vim.keymap.set('n', '<A-S-s>', ':Telescope lsp_workspace_symbols<CR>', { noremap = true, silent = true, desc = "LSP Document Symbols" })
+vim.keymap.set('n', '<A-m>', ':Telescope lsp_document_symbols<CR>', { noremap = true, silent = true, desc = "LSP Document Symbols" })
+vim.keymap.set('n', '<A-g>', ':Telescope lsp_definitions<CR>', { noremap = true, silent = true, desc = "LSP Document Symbols" })
+
+--------------------------------------------------------------------------------
+-- file-explorer
+--------------------------------------------------------------------------------
+
+-- 绑定 F4 打开 NvimTree -- 在 ginit.vim 中覆盖为 :GuiTreeviewToggle
+vim.keymap.set('n', '<F4>', ':NERDTreeToggle<CR>', { noremap = true, silent = true })
+--------------------------------------------------------------------------------
+-- LSP
+--------------------------------------------------------------------------------
+vim.lsp.config('clangd', {
+	cmd = {'clangd', '--background-index'},
+	root_markers = {'compile_commands.json'},
+	filetypes = {'cpp'},
+})
+-- 限制文件类型
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = {"c", "cpp"},
+  callback = function()
+        vim.lsp.enable('clangd')
+  end
+})
+
+-- built-in complete for lsp. -- 可与 blink.cmp 对比测试速度
+--vim.api.nvim_create_autocmd('LspAttach', {
+--		callback = function(ev)
+--			local client = vim.lsp.get_client_by_id(ev.data.client_id)
+--			if client:supports_method('textDocument/completion') then
+--				vim.lsp.completion.enable(true, client.id, ev.buf, {autotrigger = true})
+--			end
+--		end
+--	}
+--)
+--
+--vim.cmd("set completeopt+=noinsert")
+
+-- lsp report diagnostic
+vim.diagnostic.config({
+	virtual_text = {current_line = true}
+})
+
+vim.keymap.set("n", "<Leader>d", vim.diagnostic.open_float)
+
+-- diagnostic Mark need space
+vim.opt.signcolumn = "yes:2"
+
+--------------------------------------------------------------------------------
+-- cmp
+--------------------------------------------------------------------------------
+blk = require('blink.cmp')
+blk.setup {
+	sources = { 
+		default = { 'lsp','path', 'snippets', 'buffer', 'x_cmp_cn'},
+        per_filetype = {
+          c = { 'lsp' },
+          cpp = { 'lsp' },
+          text = {'x_cmp_cn'},
+          markdown = {'x_cmp_cn'},
+        },
+		providers = {
+			x_cmp_cn = {
+				name = 'x_cmp_cn',
+				module = 'x_cmp_cn'
+			}
+		},
+	},
+	keymap = { preset = 'super-tab' },
+	completion = { 
+		documentation = { auto_show = true },
+		list = {
+			selection = {
+				preselect = function (cmp)
+				    return not blk.snippet_active()
+				end
+
+			}
+		}
+	},
+	fuzzy = { implementation = "prefer_rust_with_warning" },
+}
+
+--------------------------------------------------------------------------------
+-- auto-pair
+--------------------------------------------------------------------------------
+require('nvim-autopairs').setup{}
+require('lualine').setup{}
+
+
+--------------------------------------------------------------------------------
+-- lua file by me
+--------------------------------------------------------------------------------
+
+-- 输入法控制
+-- 统一命令：第一次执行会触发 setup，之后直接调用 apply_mode
+vim.api.nvim_create_user_command("XImToggle", function(opts)
+    require('x_im_toggle').toggle(opts)
+end, { nargs = 1, complete = function() return { "cn", "en" } end })
+
+-- 快捷键触发
+vim.keymap.set('n', '<Leader>cn', ':XImToggle cn<CR>', { silent = true, desc = "开启中文模式" })
+vim.keymap.set('n', '<Leader>en', ':XImToggle en<CR>', { silent = true, desc = "切换英文模式" })
+
+-- Alt+Up/Down，移动行
+require('x_move').setup()
+
+-- <Leader>a=，对齐=号
+require('x_align').setup()
+
+-- F3，查找当前root
+require('x_root').setup()
+
+--Alt-o，切换头文件
+require('x_switch_src_h').setup()
+
+--格式化时机
+require('x_fmt').setup()
+EOF
+
+set backspace=indent,eol,start
+
+colorscheme vsassist
+"colorscheme Monokai
+"colorscheme onedark
+"colorscheme solarized8_dark
+"colorscheme catppuccin
+
+
+" Read
+set nu
+set hlsearch 
+set relativenumber
+
+" Write
+set tw=1024
+set expandtab
+set tabstop=4
+set shiftwidth=4
+set clipboard=unnamedplus "-- this cause untolerable lagging
+
+" Look
+set title
+set showtabline=2
+
+"自定义键
+nnoremap <Space><Space> :
+nnoremap cv ct_
+nnoremap dv dt_
+nnoremap cu <Esc>d/\u<CR><Esc>:noh<CR>i
+nnoremap du <Esc>d/\u<CR><Esc>:noh<CR>
+nnoremap <Leader>f /
+nnoremap <Leader>w :wa<Enter>
+nnoremap <Leader>q :wa<Enter>:qa!<Enter>
+
+nnoremap j gj
+nnoremap k gk
+nnoremap 0 g0
+nnoremap $ g$
+
+
+inoremap <A-l> <C-o>a

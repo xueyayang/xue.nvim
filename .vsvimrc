@@ -1,0 +1,22 @@
+"leader
+let mapleader=" "
+
+"opt
+set clipboard=unnamedplus
+
+"自定义键
+nnoremap <Space><Space> :
+nnoremap cv ct_
+nnoremap dv dt_
+nnoremap cu <Esc>d/\u<CR><Esc>:noh<CR>i
+nnoremap du <Esc>d/\u<CR><Esc>:noh<CR>
+nnoremap <Leader>f /
+nnoremap <Leader>w :w<Enter>
+
+nnoremap j gj
+nnoremap k gk
+nnoremap 0 g0
+nnoremap $ g$
+
+
+inoremap <A-l> <C-o>a

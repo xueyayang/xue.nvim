@@ -1,0 +1,10 @@
+/lazy-lock.json  # 如果你想多台电脑插件版本完全一致，可以不忽略它
+/lazy
+
+# 忽略临时文件
+*.swp
+*.tmp
+*.log
+
+# 忽略 Neovim 自动生成的本地数据
+.netrwhist

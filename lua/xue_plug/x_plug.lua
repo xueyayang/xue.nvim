@@ -86,6 +86,8 @@ return {
   -- 自动补全
   {
     'saghen/blink.cmp',
+    lazy = true,
+    event = "InsertEnter",  -- 在进入插入模式时懒加载
     dependencies={'https://gitee.com/xueyayang/x_cmp_cn'},
     version = "1.*",
     opts = {

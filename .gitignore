@@ -1,5 +1,4 @@
-/lazy-lock.json  # 如果你想多台电脑插件版本完全一致，可以不忽略它
-/lazy
+lazy-lock.json  
 
 # 忽略临时文件
 *.swp

@@ -19,34 +19,35 @@ vim.schedule(function()
   vim.notify(env_info, vim.log.levels.INFO, { title = "Neovim 启动" })
 end)
 
+-- vscode 环境不安装 lazy.nvim 不加载插件
 if not vim.g.vscode then
-    -- 安装 lazy.nvim
-    require('bootstrap')
+  -- 安装 lazy.nvim
+  require('bootstrap')
 
-    -- 运行 lazy.nvim
-    require("lazy").setup({
-        spec = {
-            -- 自动导入 lua/xue_plug 文件夹下的所有模块
-            { import = "xue_plug" },
-        },
-        checker = { enabled = false },
-    })
+  -- 运行 lazy.nvim
+  require("lazy").setup({
+    spec = {
+      -- 自动导入 lua/xue_plug 文件夹下的所有模块
+      { import = "xue_plug" },
+    },
+    checker = { enabled = false },
+  })
 end
 
 -- 根据环境加载相应的配置文件
 local env_name
 if vim.g.vscode then
-    -- VSCode
-    env_name = "VSCode"
-    require('vsc_nvim_init')
+  -- VSCode
+  env_name = "VSCode"
+  require('vsc_nvim_init')
 elseif vim.g.gui_running then
-    -- nvim_qt (使用 has('gui_running') 检测)
-    env_name = "nvim_qt"
-    require('nvim_qt_init')
+  -- nvim_qt (使用 has('gui_running') 检测)
+  env_name = "nvim_qt"
+  require('nvim_qt_init')
 else
-    -- 终端环境
-    env_name = "终端"
-    require('terminal_init')
+  -- 终端环境
+  env_name = "终端"
+  require('terminal_init')
 end
 
 -- 静默记录加载的配置（使用 vim.notify，不会触发 Press ENTER）

@@ -15,5 +15,12 @@ vim.api.nvim_create_autocmd("FileType", {
   end
 })
 
--- 可以在这里添加其他 LSP 服务器的配置
+-- lsp report diagnostic
+vim.diagnostic.config({
+	virtual_text = {current_line = true}
+})
 
+vim.keymap.set("n", "<Leader>d", vim.diagnostic.open_float)
+
+-- diagnostic Mark need space
+vim.opt.signcolumn = "yes:2"

@@ -19,17 +19,19 @@ vim.schedule(function()
   vim.notify(env_info, vim.log.levels.INFO, { title = "Neovim 启动" })
 end)
 
--- 安装 lazy.nvim
-require('bootstrap')
+if not vim.g.vscode then
+    -- 安装 lazy.nvim
+    require('bootstrap')
 
--- 运行 lazy.nvim
-require("lazy").setup({
-    spec = {
-        -- 自动导入 lua/xue_plug 文件夹下的所有模块
-        { import = "xue_plug" },
-    },
-    checker = { enabled = false },
-})
+    -- 运行 lazy.nvim
+    require("lazy").setup({
+        spec = {
+            -- 自动导入 lua/xue_plug 文件夹下的所有模块
+            { import = "xue_plug" },
+        },
+        checker = { enabled = false },
+    })
+end
 
 -- 根据环境加载相应的配置文件
 local env_name
@@ -49,5 +51,5 @@ end
 
 -- 静默记录加载的配置（使用 vim.notify，不会触发 Press ENTER）
 vim.schedule(function()
-  vim.notify("加载 " .. env_name .. " 配置", vim.log.levels.INFO)
+  --vim.notify("加载 " .. env_name .. " 配置", vim.log.levels.INFO)
 end)
